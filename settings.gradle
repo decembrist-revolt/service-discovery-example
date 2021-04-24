@@ -1,1 +1,5 @@
 rootProject.name = 'service-discovery-example'
+include 'discovery'
+include 'frontend'
+include 'backend'
+
