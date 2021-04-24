@@ -1,0 +1,11 @@
+services:
+  discovery:
+    image: discovery
+    ports:
+    - 8080:8080
+  backend:
+    image: backend
+  frontend:
+    image: frontend
+    ports:
+    - 8081:8081
