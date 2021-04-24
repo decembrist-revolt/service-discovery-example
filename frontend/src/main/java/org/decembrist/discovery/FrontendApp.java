@@ -50,7 +50,7 @@ class FrontendController {
         ServiceInstance backendInstance = client.getInstances("backend").get(0);
         URI backendUrl = backendInstance.getUri().resolve("/ping");
         String pong = restTemplate.getForObject(backendUrl, String.class);
-        return pong + " " + backendInstance.getServiceId();
+        return pong + " " + backendInstance.getInstanceId();
     }
 
 }
