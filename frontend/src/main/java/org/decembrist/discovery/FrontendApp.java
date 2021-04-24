@@ -3,6 +3,7 @@ package org.decembrist.discovery;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.annotation.Bean;
@@ -28,6 +29,7 @@ public class FrontendApp {
 class FrontendConfig {
 
     @Bean
+    @LoadBalanced
     public RestTemplate restTemplate() {
         return new RestTemplate();
     }
@@ -40,24 +42,18 @@ class FrontendController {
     public static final String BACKEND_SERVICE_ID = "backend";
 
     private final RestTemplate restTemplate;
-    private final DiscoveryClient client;
     private final LoadBalancerClient loadBalancer;
 
     public FrontendController(RestTemplate restTemplate,
-                              DiscoveryClient client,
                               LoadBalancerClient loadBalancer) {
         this.restTemplate = restTemplate;
-        this.client = client;
         this.loadBalancer = loadBalancer;
     }
 
     @GetMapping("/backend/ping")
     public String pong() throws IOException {
-        return loadBalancer.execute(BACKEND_SERVICE_ID, backendInstance -> {
-            URI backendUrl = backendInstance.getUri().resolve("/ping");
-            String pong = restTemplate.getForObject(backendUrl, String.class);
-            return pong + " " + backendInstance.getInstanceId();
-        });
+        URI backendUrl = URI.create("http://" + BACKEND_SERVICE_ID).resolve("/ping");
+        return restTemplate.getForObject(backendUrl, String.class);
     }
 
 }
